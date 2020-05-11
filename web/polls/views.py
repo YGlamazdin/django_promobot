@@ -1,24 +1,25 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.http import HttpResponse, StreamingHttpResponse
 from django.template import loader
 from django.urls import path
 from .robot import RobotWork
-#
+
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
+
 count = 1
 def index(request):
-    page =0
-    try:
-        page = request.GET['page']
-    except Exception as e:
-        print(e)
-    print("page", page)
-
+    # return HttpResponse("Hello, world. You're at the polls index.")
+    # global count
+    # print("info work--------------------------------------------")
+    # count+=1
+    latest_question_list=[str(count)]
     return render(
         request,
         'polls/templates/main.html',
-        context={'page': page},
+        context={'latest_question_list': latest_question_list},
     )
 
 def info(request):
@@ -114,3 +115,52 @@ def video(request):
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         pass
+
+
+
+accounts = {}
+
+def startup():
+    accounts.update({"admin": make_password(password="admin", salt=None, hasher="md5")})
+    f = open("D:/Promobot-MTS/django/polls/accounts.txt", "r")
+    for i in f:
+        split = i.split()
+        print("split: ", split)
+        accounts.update({i[0]: i[1]})
+    f.close()
+
+def register(request):
+    try:
+        login = request.POST['login']
+        password = request.POST['password']
+        try:
+            tmp = accounts[login]
+            return render(request, 'polls/templates/register.html', {"error_message": "This login already taken"})
+        except:
+            if len(password) == 0:
+                return render(request, 'polls/templates/register.html', {"error_message", "Password must be not blank"})
+            else:
+                hash_password = make_password(password=password, salt=None, hasher='md5')
+                f = open("D:/Promobot-MTS/django/polls/accounts.txt", "a")
+                f.write(str(login) + " " + str(hash_password) + "\n")
+                f.close()
+                accounts.update({login: hash_password})
+    except:
+        return render(request, 'polls/templates/register.html')
+    else:
+        return redirect('login')
+
+
+def login(request):
+    try:
+        login = request.GET['login']
+        password = request.GET['password']
+        try:
+            if check_password(password, accounts[login]):
+                return render(request, 'polls/templates/admin.html')
+            else:
+                return render(request, 'polls/templates/login.html', {"error_message": "login or password error"})
+        except:
+            return render(request, 'polls/templates/login.html', {"error_messgae": "no account with this login"})
+    except:
+        return render(request, 'polls/templates/login.html')
