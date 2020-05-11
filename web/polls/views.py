@@ -122,7 +122,7 @@ accounts = {}
 
 def startup():
     accounts.update({"admin": make_password(password="admin", salt=None, hasher="md5")})
-    f = open("D:/Promobot-MTS/django/polls/accounts.txt", "r")
+    f = open("polls/accounts.txt", "r")
     for i in f:
         split = i.split()
         print("split: ", split)
@@ -141,7 +141,7 @@ def register(request):
                 return render(request, 'polls/templates/register.html', {"error_message", "Password must be not blank"})
             else:
                 hash_password = make_password(password=password, salt=None, hasher='md5')
-                f = open("D:/Promobot-MTS/django/polls/accounts.txt", "a")
+                f = open("polls/accounts.txt", "a")
                 f.write(str(login) + " " + str(hash_password) + "\n")
                 f.close()
                 accounts.update({login: hash_password})
