@@ -3,6 +3,8 @@
 import os
 import sys
 
+#comment 123456789
+
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
