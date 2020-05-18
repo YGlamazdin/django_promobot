@@ -25,7 +25,7 @@ SECRET_KEY = '-_czga^9&8jgh@iy4^xj!1a9_vc46d$vw*r7$4wh+-587*j^ue'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -124,7 +124,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "polls", "static")
 ]
-
 
 
 PASSWORD_HASHERS = (
