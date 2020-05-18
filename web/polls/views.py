@@ -123,30 +123,28 @@ def video(request):
 accounts = {}
 
 def startup():
-    accounts.update({"admin": make_password(password="admin", salt=None, hasher="md5")})
+    accounts.update({"admin": [make_password(password="admin", salt=None, hasher="md5"), 3]})
     f = open("polls/accounts.txt", "r")
     for i in f:
         split = i.split()
-        print("split: ", split)
-        accounts.update({i[0]: i[1]})
+        accounts.update({i[0]: [i[1], i[2]]})
     f.close()
 
 def register(request):
     try:
         login = request.POST['login']
         password = request.POST['password']
-        try:
-            tmp = accounts[login]
+        if accounts.get(login) != None:
             return render(request, 'polls/templates/register.html', {"error_message": "This login already taken"})
-        except:
+        else:
             if len(password) == 0:
                 return render(request, 'polls/templates/register.html', {"error_message", "Password must be not blank"})
             else:
                 hash_password = make_password(password=password, salt=None, hasher='md5')
                 f = open("polls/accounts.txt", "a")
-                f.write(str(login) + " " + str(hash_password) + "\n")
+                f.write(str(login) + " " + str(hash_password) + " 0" + "\n")
                 f.close()
-                accounts.update({login: hash_password})
+                accounts.update({login: [hash_password, 0]})
     except:
         return render(request, 'polls/templates/register.html')
     else:
@@ -158,8 +156,11 @@ def login(request):
         login = request.GET['login']
         password = request.GET['password']
         try:
-            if check_password(password, accounts[login]):
-                return render(request, 'polls/templates/admin.html')
+            if check_password(password, accounts[login][0]):
+                if accounts[login][1] == 0:
+                    return render(request, 'polls/templates/user.html')
+                elif accounts[login][1] == 3:
+                    return render(request, 'polls/templates/admin.html')
             else:
                 return render(request, 'polls/templates/login.html', {"error_message": "login or password error"})
         except:
