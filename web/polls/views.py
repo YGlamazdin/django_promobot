@@ -24,6 +24,7 @@ def index(request):
         context={'page': page},
     )
 
+
 def info(request):
     global count
     print("info work--------------------------------------------")
